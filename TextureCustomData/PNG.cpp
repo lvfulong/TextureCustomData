@@ -35,14 +35,17 @@ bool ReadPNG(char *fileName, ImagePNG& image)
         return false;
 
     if ((png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, user_error_fn, user_warning_fn)) == NULL) {
+        fclose(fp);
         return false;
     }
     if ((info_ptr = png_create_info_struct(png_ptr)) == NULL) {
+        fclose(fp);
         png_destroy_read_struct(&png_ptr, NULL, NULL);
         return false;
     }
 
     if (setjmp(png_jmpbuf(png_ptr))) {
+        fclose(fp);
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return false;
     }
@@ -76,6 +79,7 @@ bool ReadPNG(char *fileName, ImagePNG& image)
     image.buffer = new char[height * rowbytes];
     if ((row_pointers = (png_bytepp)malloc(height * sizeof(png_bytep))) == NULL) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+        fclose(fp);
         free(row_pointers);
         return false;
     }
@@ -87,7 +91,7 @@ bool ReadPNG(char *fileName, ImagePNG& image)
     png_read_image(png_ptr, row_pointers);
     free(row_pointers);
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-
+    fclose(fp);
     return true;
 }
 bool SavePng(char* png_file_name, const ImagePNG& image, char **data, const char* userString, int compression_level)
