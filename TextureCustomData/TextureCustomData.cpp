@@ -41,7 +41,7 @@ ImageType getImgType(const char* buffer, int length) {
 
 int main(int iArgc, char* pArgv[])
 {
-    printf("------------------");
+    printf("------------------\n");
     if (iArgc < 6)
     {
         printf("lack arguments \n");
