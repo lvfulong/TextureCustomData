@@ -115,7 +115,8 @@ bool SavePng(char* png_file_name, const ImagePNG& image, char **data, const char
         return false;
     }
     png_init_io(png_ptr, png_file);
-    png_set_IHDR(png_ptr, info_ptr, image.width, image.height, image.bit_depth, image.color_type, image.interlace_method, image.compression_method, image.filter_method);
+    //png_set_IHDR(png_ptr, info_ptr, image.width, image.height, image.bit_depth, image.color_type, image.interlace_method, image.compression_method, image.filter_method);
+    png_set_IHDR(png_ptr, info_ptr, image.width, image.height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
     if (compression_level >= 0 && compression_level <= 9)
     {
         png_set_compression_level(png_ptr, compression_level); //0 - 9
