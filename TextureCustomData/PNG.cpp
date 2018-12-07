@@ -166,8 +166,21 @@ bool WritePNG(const ImagePNG& image, const char* p_pszFile, const char* userStri
 
 void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userData)
 {
-    //assert(inFile != nullptr && strlen(inFile) > 0);
-    //assert(userData != nullptr && strlen(userData) > 0);
+    if (inFile == nullptr || strlen(inFile) == 0)
+    {
+        printf("inFile file invalid");
+        return;
+    }
+    if (outFile == nullptr || strlen(outFile) == 0)
+    {
+        printf("outFile file invalid");
+        return;
+    }
+
+    if (userData == nullptr || strlen(userData) == 0)
+    {
+        return;
+    }
 
     Buffer buf;
     if (!readFileSync(inFile, buf))
