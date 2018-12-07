@@ -39,18 +39,6 @@ ImageType getImgType(const char* buffer, int length) {
     return ImgType_unknow;
 }
 
-//char* inputFilePath = "F:\\gitconchtest\\ETC\\images\\0.etc";// pArgv[1];
-//char* outputFilePath = "F:\\gitconchtest\\ETC\\images\\0ext.etc";
-//char* data = "cnmmmmmmmm hhh woai wsj";//;pArgv[3];
-//char* inputFilePath = "F:\\gitconchtest\\TPG\\layabox.png";// pArgv[1];
-//char* outputFilePath = "F:\\gitconchtest\\TPG\\layaboxExt.png";
-//"F:\\gitconchtest\\Particle_T1\\libs\\laya.d3.js"
-//char* inputFilePath = "F:\\gitconchtest\\GrayJPG\\cnm.jpg";// pArgv[1];
-//char* outputFilePath = "F:\\gitconchtest\\GrayJPG\\100xx.jpg";
-//char* data = "cnmmmmmmmm hhh woai wsj";//;pArgv[3];
-//char* inputFilePath = "F:\\gitconchtest\\ETC\\images\\0.etc";// pArgv[1];
-// char* outputFilePath = "F:\\gitconchtest\\ETC\\images\\0ext.etc";
-
 int main(int iArgc, char* pArgv[])
 {
     printf("------------------");
