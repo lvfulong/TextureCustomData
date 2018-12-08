@@ -17,8 +17,7 @@ typedef struct my_error_mgr * my_error_ptr;
 * and a compression quality factor are passed in.
 */
 
-GLOBAL(void)
-write_JPEG_file(char * filename, int quality, const ImageJPEG& image, char* data)
+GLOBAL(void) write_JPEG_file(char * filename, int quality, const ImageJPEG& image, const char* buffer, size_t bufferLength)
 {
     /* This struct contains the JPEG compression parameters and pointers to
     * working space (which is allocated as needed by the JPEG library).
@@ -95,20 +94,19 @@ write_JPEG_file(char * filename, int quality, const ImageJPEG& image, char* data
     */
     jpeg_start_compress(&cinfo, TRUE);
 
-    if (data)
+    if (buffer && bufferLength > 0)
     {
         unsigned char p[65535L];
         memset(p, 0, 65535L);
         size_t tag_length = strlen(LAYA_PROFILE);
         memcpy(p, LAYA_PROFILE, tag_length);
         p[tag_length] = '\0';
-        int dataLength = strlen(data);
-        for (size_t i = 0; i < dataLength; i += 65518L)
+        for (size_t i = 0; i < bufferLength; i += 65518L)
         {
-            size_t length = LayaMin(dataLength - i, 65518L);
+            size_t length = LayaMin(bufferLength - i, 65518L);
             p[13] = (unsigned char)((i / 65518L) + 1);
-            p[14] = (unsigned char)(dataLength / 65518L + 1);
-            memcpy(p + tag_length + 3, data + i, length);
+            p[14] = (unsigned char)(bufferLength / 65518L + 1);
+            memcpy(p + tag_length + 3, buffer + i, length);
             jpeg_write_marker(&cinfo, LAYA_MARKER, p, (unsigned int)(length + tag_length + 3));
         }
     }

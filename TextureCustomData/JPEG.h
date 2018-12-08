@@ -20,7 +20,7 @@ struct ImageJPEG
     }
 };
 /*quality 0 -- 100*/
-void write_JPEG_file(char * filename, int quality, const ImageJPEG& image, char* data);
+void write_JPEG_file(char * filename, int quality, const ImageJPEG& image, const char* buffer, size_t bufferLength);
 int read_JPEG_file(char * filename, ImageJPEG& image);
 
 class JPEG

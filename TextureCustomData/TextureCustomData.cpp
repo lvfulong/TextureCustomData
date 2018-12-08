@@ -42,7 +42,7 @@ ImageType getImgType(const char* buffer, int length) {
 int main(int iArgc, char* pArgv[])
 {
     printf("------------------\n");
-    if (iArgc < 6)
+    if (iArgc < 5)
     {
         printf("lack arguments \n");
         return 1;
@@ -50,20 +50,15 @@ int main(int iArgc, char* pArgv[])
     char* inputFilePath = pArgv[1];
     char* outputFilePath = pArgv[2];
     char* textFilePath = pArgv[3];
-    int png_compression_level = atoi(pArgv[4]);//6
-    if (png_compression_level < 0 || png_compression_level > 9)
-    {
-        printf("png_compression_level should be [0,9]");
-        return 1;
-    }
-    int jpeg_quality = atoi(pArgv[5]);//75
+
+    int jpeg_quality = atoi(pArgv[4]);//75
     if (jpeg_quality < 0 || jpeg_quality > 100)
     {
         printf("jpeg_quality should be [0,100]");
         return 1;
     }
 
-    printf(" %s %s %s %s %s \n", pArgv[1], pArgv[2], pArgv[3], pArgv[4], pArgv[5]);
+    printf(" %s %s %s %s \n", pArgv[1], pArgv[2], pArgv[3], pArgv[4]);
 
     Buffer fileBuffer;
     if (!readFileSync(inputFilePath, fileBuffer))
@@ -74,7 +69,7 @@ int main(int iArgc, char* pArgv[])
     ImageType type = getImgType(fileBuffer.m_pPtr, fileBuffer.m_nLen);
     if (type == ImgType_pvrv3)
     {
-        char* buffer = nullptr;
+       
         pvrtexture::CPVRTexture inputTexture(inputFilePath);
         pvrtexture::CPVRTexture outputTexture(inputTexture.getHeader(), inputTexture.getDataPtr());
 
@@ -83,15 +78,18 @@ int main(int iArgc, char* pArgv[])
             assert(!outputTexture.hasMetaData(0x4c415941, 0));
             outputTexture.addMetaData(inputTexture.getMetaData(0x4c415941, 0));
             assert(outputTexture.hasMetaData(0x4c415941, 0));
-        }
-        if (readJson(textFilePath, buffer))
+        } 
+        
+        char* buffer = nullptr;
+        size_t bufferLength = 0;
+        if (readJson(textFilePath, buffer, bufferLength))
         {
-            if (buffer && strlen(buffer) > 0)
+            if (buffer && bufferLength > 0)
             {
                 MetaDataBlock MetaBlock;
                 MetaBlock.DevFOURCC = 0x4c415941;//LAYA
                 MetaBlock.u32Key = 1;
-                MetaBlock.u32DataSize = strlen(buffer) + 1;
+                MetaBlock.u32DataSize = bufferLength + 1;
                 MetaBlock.Data = (PVRTuint8*)buffer;
                 outputTexture.addMetaData(MetaBlock);
                 buffer = nullptr;
@@ -106,14 +104,14 @@ int main(int iArgc, char* pArgv[])
     else if (type == ImgType_jpeg)
     {
         char* buffer = nullptr;
-        if (readJson(textFilePath, buffer))
+        size_t bufferLength = 0;
+        if (readJson(textFilePath, buffer, bufferLength))
         {
             ImageJPEG image;
             if (read_JPEG_file(inputFilePath, image))
             {
-                write_JPEG_file(outputFilePath, jpeg_quality, image, buffer);
+                write_JPEG_file(outputFilePath, jpeg_quality, image, buffer, bufferLength + 1);
             }
-
         }
         if (buffer)
         {
@@ -123,13 +121,15 @@ int main(int iArgc, char* pArgv[])
     else if (type == ImgType_png)
     {
         char* buffer = nullptr;
-        if (readJson(textFilePath, buffer))
+        size_t bufferLength = 0;
+        if (readJson(textFilePath, buffer, bufferLength))
         {
-            ImagePNG image;
+            AddLayaTrunkPNG(inputFilePath, outputFilePath, buffer, bufferLength + 1);
+            /*ImagePNG image;
             if (ReadPNG(inputFilePath, image))
             {
                 WritePNG(image, outputFilePath, buffer, png_compression_level);
-            }
+            }*/
         }
         if (buffer)
         {

@@ -4,7 +4,7 @@
 #include "stdint.h"
 #include "string.h"
 
-bool readJson(const char* file, char*& buffer)
+bool readJson(const char* file, char*& buffer, size_t& bufferLength)
 {
     FILE* pf = NULL;
     pf = fopen(file, "rb");
@@ -16,6 +16,7 @@ bool readJson(const char* file, char*& buffer)
     buffer = new char[len + 1];
     int readlen = fread(buffer, 1, len, pf);
     if (readlen != len) {
+        bufferLength = 0;
         fclose(pf);
         delete[] buffer;
         buffer = nullptr;
@@ -23,6 +24,7 @@ bool readJson(const char* file, char*& buffer)
     }
     fclose(pf);
     buffer[len] = 0;
+    bufferLength = len;
     return true;
 }
 bool writeFileSync(const char* p_pszFile, char* p_pBuff, int p_nLen, int p_nEncode)

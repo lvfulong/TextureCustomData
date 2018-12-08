@@ -25,6 +25,6 @@ public:
     int				m_bAlign4 : 1;		//每次操作都按照4字节对齐？
     int				m_bNeedDel : 1;
 };
-bool readJson(const char* file, char*& buffer);
+bool readJson(const char* file, char*& buffer, size_t& bufferLength);
 bool readFileSync(const char* p_pszFile, Buffer& p_buf, int p_nEncode = Buffer::raw);
 bool writeFileSync(const char* p_pszFile, char* p_pBuff, int p_nLen, int p_nEncode = Buffer::raw);

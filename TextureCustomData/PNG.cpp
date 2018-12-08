@@ -169,7 +169,7 @@ bool WritePNG(const ImagePNG& image, const char* p_pszFile, const char* userStri
     ((png_uint_32)(*((buf) + 2)) << 8) + \
     ((png_uint_32)(*((buf) + 3))))
 
-void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userData)
+void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userData, size_t userDataLength)
 {
     if (inFile == nullptr || strlen(inFile) == 0)
     {
@@ -182,7 +182,7 @@ void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userDa
         return;
     }
 
-    if (userData == nullptr || strlen(userData) == 0)
+    if (userData == nullptr || userDataLength <= 0)
     {
         return;
     }
@@ -197,7 +197,6 @@ void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userDa
     char* IHDR = buf.m_pPtr + 8;
     uint32_t IHDRLength = PNG_get_uint_32(IHDR)  + 4 * 3;
    
-    size_t userDataLength = strlen(userData) + 1;
     size_t layaTrunkLength = userDataLength + 4 * 3;
 
     size_t bufferLength = buf.m_nLen + layaTrunkLength;
@@ -206,10 +205,10 @@ void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userDa
 
     unsigned char* layaTrunk = buffer + IHDRLength + 8;
     //Length 4 bytes
-    layaTrunk[0] = (unsigned char)(layaTrunkLength >> 24);
-    layaTrunk[1] = (unsigned char)(layaTrunkLength >> 16);
-    layaTrunk[2] = (unsigned char)(layaTrunkLength >> 8);
-    layaTrunk[3] = (unsigned char)(layaTrunkLength);
+    layaTrunk[0] = (unsigned char)(userDataLength >> 24);
+    layaTrunk[1] = (unsigned char)(userDataLength >> 16);
+    layaTrunk[2] = (unsigned char)(userDataLength >> 8);
+    layaTrunk[3] = (unsigned char)(userDataLength);
     //Chunk type 4 bytes
     memcpy((void*)(layaTrunk + 4), mng_LAYA, 4);
     //Chunk data Length bytes

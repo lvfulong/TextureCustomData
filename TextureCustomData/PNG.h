@@ -24,4 +24,4 @@ struct ImagePNG
 };
 bool ReadPNG(char *fileName, ImagePNG& image/*, unsigned char* data, int dataSize*/);
 bool WritePNG(const ImagePNG& image, const char* p_pszFile, const char* userString, int compression_level = 0);//0-9 Ω®“È3-6
-void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userData);
+void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userData, size_t userDataLength);
