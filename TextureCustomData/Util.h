@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 class Buffer
 {
 public:
@@ -25,6 +26,9 @@ public:
     int				m_bAlign4 : 1;		//每次操作都按照4字节对齐？
     int				m_bNeedDel : 1;
 };
+enum ByteOrder { invalidByteOrder, littleEndian, bigEndian };
 bool readJson(const char* file, char*& buffer, size_t& bufferLength);
 bool readFileSync(const char* p_pszFile, Buffer& p_buf, int p_nEncode = Buffer::raw);
 bool writeFileSync(const char* p_pszFile, char* p_pBuff, int p_nLen, int p_nEncode = Buffer::raw);
+int32_t getLong(const uint8_t* buf, ByteOrder byteOrder);
+long ul2Data(uint8_t* buf, uint32_t l, ByteOrder byteOrder);

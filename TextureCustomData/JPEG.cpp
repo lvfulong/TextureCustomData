@@ -5,6 +5,8 @@
 #include "assert.h"
 #include "stdint.h"
 #include "string.h"
+#include "Util.h"
+
 struct my_error_mgr {
     struct jpeg_error_mgr pub;	/* "public" fields */
 
@@ -100,14 +102,17 @@ GLOBAL(void) write_JPEG_file(char * filename, int quality, const ImageJPEG& imag
         memset(p, 0, 65535L);
         size_t tag_length = strlen(LAYA_PROFILE);
         memcpy(p, LAYA_PROFILE, tag_length);
-        p[tag_length] = '\0';
-        for (size_t i = 0; i < bufferLength; i += 65518L)
+        p[tag_length] = '\0'; 
+        
+        for (size_t i = 0; i < bufferLength; i += 65514L)
         {
-            size_t length = LayaMin(bufferLength - i, 65518L);
-            p[13] = (unsigned char)((i / 65518L) + 1);
-            p[14] = (unsigned char)(bufferLength / 65518L + 1);
-            memcpy(p + tag_length + 3, buffer + i, length);
-            jpeg_write_marker(&cinfo, LAYA_MARKER, p, (unsigned int)(length + tag_length + 3));
+            size_t length = LayaMin(bufferLength - i, 65514L);
+            p[13] = (unsigned char)((i / 65514L) + 1);
+            p[14] = (unsigned char)(bufferLength / 65514L + 1);
+
+            ul2Data(p + 15, bufferLength, bigEndian);
+            memcpy(p + tag_length + 7, buffer + i, length);
+            jpeg_write_marker(&cinfo, LAYA_MARKER, p, (unsigned int)(length + tag_length + 7));
         }
     }
 

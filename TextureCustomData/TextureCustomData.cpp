@@ -11,6 +11,7 @@
 #include "JPEG.h"
 #include "PNG.h"
 #include "Util.h"
+#include<filesystem>  
 /*
 pArgv[1] inputPath
 pArgv[2] outputPath
@@ -41,7 +42,6 @@ ImageType getImgType(const char* buffer, int length) {
 
 int main(int iArgc, char* pArgv[])
 {
-    printf("------------------\n");
     if (iArgc < 5)
     {
         printf("lack arguments \n");
@@ -54,16 +54,16 @@ int main(int iArgc, char* pArgv[])
     int jpeg_quality = atoi(pArgv[4]);//75
     if (jpeg_quality < 0 || jpeg_quality > 100)
     {
-        printf("jpeg_quality should be [0,100]");
+        printf("jpeg_quality should be [0,100]\n");
         return 1;
     }
 
-    printf(" %s %s %s %s \n", pArgv[1], pArgv[2], pArgv[3], pArgv[4]);
+    printf("proccessing... %s %s %s %s \n", pArgv[1], pArgv[2], pArgv[3], pArgv[4]);
 
     Buffer fileBuffer;
     if (!readFileSync(inputFilePath, fileBuffer))
     {
-        printf("open file %s failed", inputFilePath);
+        printf("open file %s failed\n", inputFilePath);
         return 1;
     }
     ImageType type = getImgType(fileBuffer.m_pPtr, fileBuffer.m_nLen);
@@ -96,6 +96,19 @@ int main(int iArgc, char* pArgv[])
             }
         }
         outputTexture.saveFile(CPVRTString(outputFilePath, strlen(outputFilePath)));
+
+        std::tr2::sys::path inputPath = (inputFilePath);
+        std::string fileExtension = inputPath.extension().string();
+        if (fileExtension != ".pvr")
+        {
+            if (std::tr2::sys::exists(outputFilePath))
+            {
+                std::tr2::sys::remove(outputFilePath);
+            }
+            std::string realOutputFile(outputFilePath);
+            realOutputFile += ".pvr";
+            std::rename(realOutputFile.c_str(), outputFilePath);
+        }
         if (buffer)
         {
             delete[] buffer;

@@ -4,6 +4,33 @@
 #include "stdint.h"
 #include "string.h"
 
+int32_t getLong(const uint8_t* buf, ByteOrder byteOrder)
+{
+    if (byteOrder == littleEndian) {
+        return   (uint8_t)buf[3] << 24 | (uint8_t)buf[2] << 16
+            | (uint8_t)buf[1] << 8 | (uint8_t)buf[0];
+    }
+    else {
+        return   (uint8_t)buf[0] << 24 | (uint8_t)buf[1] << 16
+            | (uint8_t)buf[2] << 8 | (uint8_t)buf[3];
+    }
+}
+long ul2Data(uint8_t* buf, uint32_t l, ByteOrder byteOrder)
+{
+    if (byteOrder == littleEndian) {
+        buf[0] = (uint8_t)(l & 0x000000ff);
+        buf[1] = (uint8_t)((l & 0x0000ff00) >> 8);
+        buf[2] = (uint8_t)((l & 0x00ff0000) >> 16);
+        buf[3] = (uint8_t)((l & 0xff000000) >> 24);
+    }
+    else {
+        buf[0] = (uint8_t)((l & 0xff000000) >> 24);
+        buf[1] = (uint8_t)((l & 0x00ff0000) >> 16);
+        buf[2] = (uint8_t)((l & 0x0000ff00) >> 8);
+        buf[3] = (uint8_t)(l & 0x000000ff);
+    }
+    return 4;
+}
 bool readJson(const char* file, char*& buffer, size_t& bufferLength)
 {
     FILE* pf = NULL;
