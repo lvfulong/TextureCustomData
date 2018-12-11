@@ -97,7 +97,7 @@ int main(int iArgc, char* pArgv[])
         }        
         else
         {
-            printf("open file %s failed\n", textFilePath);
+            printf("pvr open file %s failed\n", textFilePath);
             return 1;
         }
         outputTexture.saveFile(CPVRTString(outputFilePath, strlen(outputFilePath)));
