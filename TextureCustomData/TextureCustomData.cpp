@@ -94,6 +94,11 @@ int main(int iArgc, char* pArgv[])
                 outputTexture.addMetaData(MetaBlock);
                 buffer = nullptr;
             }
+        }        
+        else
+        {
+            printf("open file %s failed\n", textFilePath);
+            return 1;
         }
         outputTexture.saveFile(CPVRTString(outputFilePath, strlen(outputFilePath)));
 
@@ -109,10 +114,7 @@ int main(int iArgc, char* pArgv[])
             realOutputFile += ".pvr";
             std::rename(realOutputFile.c_str(), outputFilePath);
         }
-        else
-        {
-            printf("open file %s failed\n", textFilePath);
-        }
+
         if (buffer)
         {
             delete[] buffer;
@@ -133,6 +135,7 @@ int main(int iArgc, char* pArgv[])
         else
         {
             printf("open file %s failed\n", textFilePath);
+            return 1;
         }
         if (buffer)
         {
@@ -155,6 +158,7 @@ int main(int iArgc, char* pArgv[])
         else
         {
             printf("open file %s failed\n", textFilePath);
+            return 1;
         }
         if (buffer)
         {
