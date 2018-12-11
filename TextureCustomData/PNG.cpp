@@ -9,7 +9,7 @@
 #include <zlib.h>
 
 //static const png_byte mng_LAYA[5] = { 76, 65, 89, 65, (png_byte) '\0' };
-static const png_byte mng_LAYA[5] = { 'L',  'A',  'Y', 'A', (png_byte) '\0' };
+static const png_byte mng_LAYA[5] = { 'i',  'T',  'X', 't', (png_byte) '\0' };
 
 void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
 {
@@ -168,7 +168,34 @@ bool WritePNG(const ImagePNG& image, const char* p_pszFile, const char* userStri
     ((png_uint_32)(*((buf) + 1)) << 16) + \
     ((png_uint_32)(*((buf) + 2)) << 8) + \
     ((png_uint_32)(*((buf) + 3))))
+std::string makeUtf8TxtChunk(const std::string& keyword, const std::string& text)
+{
+    // Chunk structure: length (4 bytes) + chunk type + chunk data + CRC (4 bytes)
+    // Length is the size of the chunk data
+    // CRC is calculated on chunk type + chunk data
 
+    // Chunk data format : keyword + 0x00 + compression flag (0x00: uncompressed - 0x01: compressed)
+    //                     + compression method (0x00: zlib format) + language tag (null) + 0x00
+    //                     + translated keyword (null) + 0x00 + text (compressed or not)
+
+    // Build chunk data, determine chunk type
+    std::string chunkData = keyword;
+    static const char flags[] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
+    chunkData += std::string(flags, 5) + text;
+    // Determine length of the chunk data
+    uint8_t length[4];
+    ul2Data(length, static_cast<uint32_t>(chunkData.size()), bigEndian);
+    // Calculate CRC on chunk type and chunk data
+    std::string chunkType = "iTXt";
+    std::string crcData = chunkType + chunkData;
+    uLong tmp = crc32(0L, Z_NULL, 0);
+    tmp = crc32(tmp, (const Bytef*)crcData.data(), static_cast<uInt>(crcData.size()));
+    uint8_t crc[4];
+    ul2Data(crc, tmp, bigEndian);
+    // Assemble the chunk
+    return std::string((const char*)length, 4) + chunkType + chunkData + std::string((const char*)crc, 4);
+
+}
 void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userData, size_t userDataLength)
 {
     if (inFile == nullptr || strlen(inFile) == 0)
@@ -194,31 +221,21 @@ void AddLayaTrunkPNG(const char* inFile, const char* outFile, const char* userDa
         return;
     }
 
+    std::string trunk = makeUtf8TxtChunk("LAYA", std::string(userData, userDataLength));
+
+
     char* IHDR = buf.m_pPtr + 8;
     uint32_t IHDRLength = PNG_get_uint_32(IHDR)  + 4 * 3;
    
-    size_t layaTrunkLength = userDataLength + 4 * 3;
+    size_t layaTrunkLength = trunk.size();
 
     size_t bufferLength = buf.m_nLen + layaTrunkLength;
     unsigned char* buffer = new unsigned char[bufferLength];
     memcpy(buffer, buf.m_pPtr, IHDRLength + 8);
 
     unsigned char* layaTrunk = buffer + IHDRLength + 8;
-    //Length 4 bytes
-    layaTrunk[0] = (unsigned char)(userDataLength >> 24);
-    layaTrunk[1] = (unsigned char)(userDataLength >> 16);
-    layaTrunk[2] = (unsigned char)(userDataLength >> 8);
-    layaTrunk[3] = (unsigned char)(userDataLength);
-    //Chunk type 4 bytes
-    memcpy((void*)(layaTrunk + 4), mng_LAYA, 4);
-    //Chunk data Length bytes
-    memcpy((void*)(layaTrunk + 8), userData, userDataLength);
-    //CRC 4 bytes
-    uLong crc = crc32(0, layaTrunk + 4, 4 + userDataLength);
-    layaTrunk[0 + 4 + 4 + userDataLength] = (unsigned char)(crc >> 24);
-    layaTrunk[1 + 4 + 4 + userDataLength] = (unsigned char)(crc >> 16);
-    layaTrunk[2 + 4 + 4 + userDataLength] = (unsigned char)(crc >> 8);
-    layaTrunk[3 + 4 + 4 + userDataLength] = (unsigned char)(crc);
+
+    memcpy(layaTrunk, trunk.c_str(), trunk.size());
 
     memcpy(buffer + 8 + IHDRLength + layaTrunkLength, IHDR + IHDRLength, buf.m_nLen - (IHDRLength + 8));
 

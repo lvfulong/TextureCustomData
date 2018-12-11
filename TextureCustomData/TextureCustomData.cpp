@@ -109,6 +109,10 @@ int main(int iArgc, char* pArgv[])
             realOutputFile += ".pvr";
             std::rename(realOutputFile.c_str(), outputFilePath);
         }
+        else
+        {
+            printf("open file %s failed\n", textFilePath);
+        }
         if (buffer)
         {
             delete[] buffer;
@@ -125,6 +129,10 @@ int main(int iArgc, char* pArgv[])
             {
                 write_JPEG_file(outputFilePath, jpeg_quality, image, buffer, bufferLength + 1);
             }
+        }
+        else
+        {
+            printf("open file %s failed\n", textFilePath);
         }
         if (buffer)
         {
@@ -143,6 +151,10 @@ int main(int iArgc, char* pArgv[])
             {
                 WritePNG(image, outputFilePath, buffer, png_compression_level);
             }*/
+        }
+        else
+        {
+            printf("open file %s failed\n", textFilePath);
         }
         if (buffer)
         {
